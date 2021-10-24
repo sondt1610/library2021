@@ -41,7 +41,8 @@ if ( isset($_POST['login']) ) {
     
 }
 
-// vercode cũ 
+// vercode cũ
+
 // if (isset($_POST['login'])) {
 //     //code for captach verification
 //     if ($_POST["vercode"] != $_SESSION["vercode"] or $_SESSION["vercode"] == '') {
