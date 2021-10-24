@@ -2,10 +2,90 @@
 session_start();
 include('includes/config.php');
 error_reporting(0);
+
+function interpolateQuery($query, $params) {
+    $keys = array();
+
+    # build a regular expression for each parameter
+    foreach ($params as $key => $value) {
+        if (is_string($key)) {
+            $keys[] = '/:'.$key.'/';
+        } else {
+            $keys[] = '/[?]/';
+        }
+    }
+
+    $query = preg_replace($keys, $params, $query, 1, $count);
+
+    #trigger_error('replaced '.$count.' keys');
+
+    return $query;
+}
+
 if (strlen($_SESSION['alogin']) == 0) {
     header('location:adminlogin.php');
 } else {
+    $sql_select      = "SELECT * FROM setting";
+    $query_select    = $dbh->prepare($sql_select);
+    $query_select->execute();
+    $setting = $query_select->fetch();
+    if(empty($setting)) {
+        $setting = [
+            'id' => 0,
+            'school_name' => '',
+            'school_mail' => '',
+            'max_lended_book' => SOLANMUON,
+            'max_lended_time' => SONGAY,
+        ];
+    }
+//    var_dump($_SESSION);
+    if($_SESSION['msg']){
+        $msg = $_SESSION['msg'];
+    }
+    if($_SESSION['error']){
+        $error = $_SESSION['error'];
+    }
+    if (isset($_POST['save_settings'])) {
+        $id = $_POST['id'];
+        $school_name = $_POST['school_name'];
+        $school_mail = $_POST['school_mail'];
+        $max_lended_book = $_POST['max_lended_book'];
+        $max_lended_time = $_POST['max_lended_time'];
 
+        if($id) {
+            $sql_update = "update  setting set school_name=:school_name, school_mail=:school_mail,
+                max_lended_book=:max_lended_book, max_lended_time=:max_lended_time where id=:id";
+        } else {
+            $sql_update = "INSERT INTO  setting(school_name, school_mail, max_lended_book, max_lended_time)
+                VALUES(:school_name, :school_mail, :max_lended_book, :max_lended_time)";
+        }
+        $query_update = $dbh->prepare($sql_update);
+        if($id) {
+            $query_update->bindParam(':id', $id, PDO::PARAM_STR);
+        }
+        $query_update->bindParam(':school_name', $school_name, PDO::PARAM_STR);
+        $query_update->bindParam(':school_mail', $school_mail, PDO::PARAM_STR);
+        $query_update->bindParam(':max_lended_book', $max_lended_book, PDO::PARAM_STR);
+        $query_update->bindParam(':max_lended_time', $max_lended_time, PDO::PARAM_STR);
+        $status_update = $query_update->execute();
+        $new_params = [
+            'id' => $id,
+            'school_name' => $school_name,
+            'school_mail' => $school_mail,
+            'max_lended_book' => $max_lended_book,
+            'max_lended_time' => $max_lended_time,
+        ];
+        $query_detail = interpolateQuery($query_update->queryString, $new_params);
+        if($status_update){
+            $_SESSION['msg'] = "update setting success";
+        } else {
+            $_SESSION['error'] = "error";
+        }
+        header('location:setting.php');
+    } else {
+        $_SESSION['msg'] = "";
+        $_SESSION['error'] = "";
+    }
 
     ?>
     <!DOCTYPE html>
@@ -69,24 +149,32 @@ if (strlen($_SESSION['alogin']) == 0) {
             <?php if ($error) { ?>
                 <div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?>
                 </div><?php } else if ($msg) { ?>
-                <div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php } ?>
+                <div class="succWrap"><strong>SUCCESS</strong>: <?php echo htmlentities($msg); ?> </div><?php } ?>
             <!--LOGIN PANEL START-->
             <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                     <div class="panel panel-info">
                         <div class="panel-heading">設定</div>
                         <div class="panel-body">
-                            <form role="form" method="post" onSubmit="return valid();" name="chngpwd">
-
+                            <form role="form" method="post" name="chngpwd">
+                                <input name="id" class="form-control d-none" type="text" value="<?= $setting['id'] ?>"/>
+                                <div class="form-group">
+                                    <label>Tên trường</label>
+                                    <input name="school_name" class="form-control" type="text" value="<?= $setting['school_name'] ?>"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mail trường</label>
+                                    <input name="school_mail" class="form-control" type="text" value="<?= $setting['school_mail'] ?>"/>
+                                </div>
                                 <div class="form-group">
                                     <label>最多の借りる回数</label>
-                                    <input class="form-control" disabled type="number" value="<?= SOLANMUON ?>"/>
+                                    <input name="max_lended_book" class="form-control" type="number"  value="<?= $setting['max_lended_book'] ?>"/>
                                 </div>
-
                                 <div class="form-group">
-                                    <label>期間</label>
-                                    <input class="form-control" disabled type="text" value="<?= SONGAY ?> 日"/>
+                                    <label>Số ngày mượn tối đa</label>
+                                    <input name="max_lended_time" class="form-control" type="number"  value="<?= $setting['max_lended_time'] ?>"/>
                                 </div>
+                                <button type="submit" name="save_settings" class="btn btn-info">Lưu</button>
                             </form>
                         </div>
                     </div>
@@ -104,7 +192,6 @@ if (strlen($_SESSION['alogin']) == 0) {
     <!-- BOOTSTRAP SCRIPTS  -->
     <script src="assets/js/bootstrap.js"></script>
     <!-- CUSTOM SCRIPTS  -->
-    <script src="assets/js/custom.js"></script>
     </body>
     </html>
 <?php } ?>
