@@ -5,68 +5,16 @@ include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header('location:adminlogin.php');
 } else {
-    if($_SESSION['msg']){
-        $msg = $_SESSION['msg'];
+    if (isset($_GET['email'])) {
+        $id    = $_GET['email'];
+        var_dump($id);
+//        $sql   = "delete from yx_books  WHERE id=:id";
+//        $query = $dbh->prepare($sql);
+//        $query->bindParam(':id', $id, PDO::PARAM_STR);
+//        $query->execute();
+//        $_SESSION['delmsg'] = "Category deleted scuccessfully ";
+//        header('location:manage-books.php');
     }
-    if($_SESSION['error']){
-        $error = $_SESSION['error'];
-    }
-    if (isset($_GET['lend_id']) && isset($_GET['book_id'])) {
-        $lend_id    = $_GET['lend_id'];
-        $book_id    = $_GET['book_id'];
-//        $book_id    = 2;
-        $sql_query_lend = "SELECT * FROM `lend` WHERE lend.id = '" . $lend_id . "'";
-        $query_select_lend    = $dbh->prepare($sql_query_lend);
-        $query_select_lend->execute();
-        $lend = $query_select_lend->fetch(PDO::FETCH_OBJ);
-        $status_update_lend = false;
-        $mess = '';
-        if($lend) {
-            $sql_update_lend      = "update  lend set is_returned=1 where id='" . $lend->id . "'";
-            $query_update_lend    = $dbh->prepare($sql_update_lend);
-            $status_update_lend = $query_update_lend->execute();
-//            var_dump($status_update_lend);
-        }
-        if($status_update_lend){
-            $mess = 'Trả sách thành công';
-        }
-        $sql_query_reserve = "SELECT yx_books.name as book_name, user.name as user_name, yoyaku.id, yoyaku.book_id, yoyaku.user_id  FROM `yoyaku` 
-            join user on user.id=yoyaku.user_id 
-            join yx_books on yx_books.id=yoyaku.book_id 
-            WHERE yoyaku.book_id = '" . $book_id . "' ORDER BY booking_time ASC";
-        $query_select_reserve    = $dbh->prepare($sql_query_reserve);
-        $query_select_reserve->execute();
-        $reserve = $query_select_reserve->fetch(PDO::FETCH_OBJ);
-        if($reserve) {
-            $sql_update_reserve = "update  yoyaku set is_booked=1 where id='" . $reserve->id . "'";
-            $query_update_reserve  = $dbh->prepare($sql_update_reserve);
-            $status_update_reserve = $query_update_reserve->execute();
-            if($status_update_reserve) {
-                $now = date('Y-m-d');
-                $date = strtotime($now);
-                $date = strtotime("+14 day", $date);
-                $date = date('Y-m-d', $date);
-                $sql_create_lend      = "INSERT INTO lend (book_id, lend_time, return_time, user_id)
-                    VALUES (". $book_id .", '". $now ."', '". $date ."', ". $reserve->user_id .")";
-                $query_create_lend    = $dbh->prepare($sql_create_lend);
-                $status_create_lend  = $query_create_lend->execute();
-                if($status_create_lend){
-                    $mess = "Trả sách thành công và cho user: $reserve->user_name mượn sách: $reserve->book_name thành công";
-                }
-            }
-        }
-
-        if($mess) {
-            $_SESSION['msg'] = $mess;
-        } else {
-            $_SESSION['error'] = "Lỗi hệ thống, trả sách không thành công";
-        }
-        header('location:manage-lead.php');
-    } else {
-        $_SESSION['msg'] = "";
-        $_SESSION['error'] = "";
-    }
-
     ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -96,32 +44,14 @@ if (strlen($_SESSION['alogin']) == 0) {
         <div class="container">
             <div class="row pad-botm">
                 <div class="col-md-12">
-                    <h4 class="header-line">貸出管理</h4>
+                    <h4 class="header-line">Danh sách mượn quá hạn</h4>
                 </div>
             </div>
             <div class="row">
-                <?php if ($error != "") {
-                    ?>
-                    <div class="col-md-12">
-                        <div class="alert alert-danger">
-                            <strong>Error :</strong>
-                            <?php echo htmlentities($error); ?>
-                        </div>
-                    </div>
-                <?php } ?>
-                <?php if ($msg != "") {
-                    ?>
-                    <div class="col-md-12">
-                        <div class="alert alert-success">
-                            <strong>Success :</strong>
-                            <?php echo htmlentities($msg); ?>
-                        </div>
-                    </div>
-                <?php } ?>
                 <div class="col-md-12">
                     <!-- Advanced Tables -->
                     <div class="panel panel-default">
-                        <div class="panel-heading">貸出リスト</div>
+                        <div class="panel-heading">Danh sách mượn quá hạn</div>
                         <div class="panel-body">
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-hover" id="dataTables-example">
@@ -133,16 +63,16 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         <th>本のタイトル</th>
                                         <th>借りる日</th>
                                         <th>返却日</th>
-                                        <th>Action</th>
+<!--                                        <th>Action</th>-->
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <!-- database info -->
-                                    <?php $sql = "SELECT user.name,user.number as GakuSekiNumber, yx_books.name as BookName, yx_books.leave_number,  
-                                    lend.id, lend.return_time , lend.book_id, lend.is_returned,
+                                    <?php $sql = "SELECT user.email,user.name,user.number as GakuSekiNumber, yx_books.name as BookName, yx_books.leave_number,  
+                                    lend.id, lend.return_time , lend.book_id, 
                                             lend.lend_time, lend.user_id  from lend join user 
-                                        on user.id = lend.user_id join yx_books on yx_books.id = lend.book_id where lend.is_returned = 0";
-//die('43');
+                                        on user.id = lend.user_id join yx_books on yx_books.id = lend.book_id  WHERE lend.return_time < '" . date('Y-m-d') . "'";
+
                                     $query     = $dbh->prepare($sql);
                                     $query->execute();
                                     $results = $query->fetchAll(PDO::FETCH_OBJ);
@@ -156,10 +86,10 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <td class="center"><?php echo htmlentities($result->BookName); ?></td>
                                                 <td class="center"><?php echo htmlentities($result->lend_time); ?></td>
                                                 <td class="center"><?php echo htmlentities($result->return_time); ?></td>
-                                                <td class="center">
-                                                    <a href="manage-lead.php?lend_id=<?php echo htmlentities($result->id); ?>&book_id=<?php echo htmlentities($result->book_id); ?>"
-                                                    <button class="btn btn-xs btn-primary">Trả sách</button>
-                                                </td>
+<!--                                                <td class="center">-->
+<!--                                                    <a href="list_lend_overdue.php?email=--><?php //echo htmlentities($result->email); ?><!--"-->
+<!--                                                    <button class="btn btn-xs btn-primary">Thông báo</button>-->
+<!--                                                </td>-->
                                             </tr>
                                             <?php $cnt = $cnt + 1;
                                         }
@@ -167,10 +97,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     </tbody>
                                 </table>
                             </div>
-                            <?php
-//                                $_SESSION['msg'] = '';
-//                                $_SESSION['error'] = '';
-                            ?>
+
                         </div>
                     </div>
                     <!--End Advanced Tables -->

@@ -108,6 +108,13 @@ border-color: rgba(155, 153, 153, 0.23);
     width: 800px;
     margin: 0 auto 30px auto;
 }
+.wrap_date{
+    display: flex;
+    width: 100%;
+}
+.tilde{
+    margin: 0 15px;
+}
 .bar_chart_statistic{
     /*width: calc(100vw - 30px);*/
     width: 100%;
@@ -120,6 +127,17 @@ border-color: rgba(155, 153, 153, 0.23);
     width: 400px;
     height: 400px;
     margin: 0 auto 30px auto;
+}
+.notification{
+    right: -14px;
+    position: absolute;
+    top: -13px;
+    background: red;
+    padding: 4px;
+    font-size: 11px;
+    color: white;
+    line-height: 10px;
+    border-radius: 50%;
 }
 /* =============================================================
    FOOTER SECTION STYLES

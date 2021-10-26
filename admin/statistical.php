@@ -1,11 +1,7 @@
 <?php
-    session_start();
-    error_reporting(0);
-
-    $conn = mysqli_connect("localhost", "root", "", "library2021") or die ("Errors Connect DB");
-    mysqli_set_charset($conn, "utf8");
-
-
+session_start();
+error_reporting(0);
+include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header('location:adminlogin.php');
 } else {
@@ -40,12 +36,12 @@ if (strlen($_SESSION['alogin']) == 0) {
         <div class="container">
             <div class="row pad-botm">
                 <div class="col-md-12">
-                    <h4 class="header-line">統計</h4>
+                    <h4 class="header-line">統計期間</h4>
                 </div>
                 <div class="chart_statistic">
-                    <div class="row">
-                        <div class='col-sm-4'>
-                            <div class="form-group">
+                    <div class="wrap_date">
+                        <div style="width: 220px">
+                            <div class="form-group" style="margin-bottom: 0px">
                                 <div class='input-group date' id='start_date'>
                                     <input type='text' class="form-control" class="start_date_class"/>
                                     <span class="input-group-addon">
@@ -54,8 +50,9 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 </div>
                             </div>
                         </div>
-                        <div class='col-sm-4'>
-                            <div class="form-group">
+                        <div class="tilde">~</div>
+                        <div style="width: 220px">
+                            <div class="form-group" style="margin-bottom: 0px">
                                 <div class='input-group date' id='end_date'>
                                     <input type='text' class="form-control"/>
                                     <span class="input-group-addon">
@@ -64,6 +61,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 </div>
                             </div>
                         </div>
+                        <button
+                            name="trigger_statistic" class="btn btn-info" onclick="trigger_show_statistic()"
+                            style="margin-left: 15px"
+                        >
+                            集計
+                        </button>
+                    </div>
+                    <div class="row">
                         <div class='col-sm-12'>
                             <div class='bar_chart_statistic'>
                                 <canvas id="barChart" width="400" height="200"></canvas>
@@ -99,6 +104,11 @@ if (strlen($_SESSION['alogin']) == 0) {
 <!--        <script data-require="chart.js@0.2.0" data-semver="0.2.0" src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
         <script type="text/javascript">
+            function trigger_show_statistic() {
+                var new_start_date = moment($('#start_date').datepicker("getDate")).format('YYYY-MM-DD');
+                var new_end_date = moment($('#end_date').datepicker("getDate")).format('YYYY-MM-DD');
+                getData(new_start_date, new_end_date);
+            }
             var ctx = document.getElementById('barChart');
             var barChart = new Chart(ctx, {
                 type: 'bar',
@@ -149,12 +159,12 @@ if (strlen($_SESSION['alogin']) == 0) {
                     autoclose: true,
                     language: 'ja'
                 }).datepicker('setDate', start_date).datepicker('update');
-                $('#start_date').datepicker().on('changeDate', function (e) {
-                    var new_end_date = moment($('#end_date').datepicker("getDate")).format('YYYY-MM-DD');
-                    var new_start_date = moment(e.date).format('YYYY-MM-DD');
-                    console.log("dfgd", new_start_date, new_end_date);
-                    getData(new_start_date, new_end_date);
-                });
+                // $('#start_date').datepicker().on('changeDate', function (e) {
+                //     var new_end_date = moment($('#end_date').datepicker("getDate")).format('YYYY-MM-DD');
+                //     var new_start_date = moment(e.date).format('YYYY-MM-DD');
+                //     console.log("dfgd", new_start_date, new_end_date);
+                //     getData(new_start_date, new_end_date);
+                // });
 
                 $("#end_date").datepicker({
                     isRTL: false,
@@ -162,12 +172,12 @@ if (strlen($_SESSION['alogin']) == 0) {
                     autoclose: true,
                     language: 'ja'
                 }).datepicker('setDate', end_date).datepicker('update');
-                $('#end_date').datepicker().on('changeDate', function (e) {
-                    var new_start_date = moment($('#start_date').datepicker("getDate")).format('YYYY-MM-DD');
-                    var new_end_date = moment(e.date).format('YYYY-MM-DD');
-                    console.log("12345", new_start_date, new_end_date);
-                    getData(new_start_date, new_end_date);
-                });
+                // $('#end_date').datepicker().on('changeDate', function (e) {
+                //     var new_start_date = moment($('#start_date').datepicker("getDate")).format('YYYY-MM-DD');
+                //     var new_end_date = moment(e.date).format('YYYY-MM-DD');
+                //     console.log("12345", new_start_date, new_end_date);
+                //     getData(new_start_date, new_end_date);
+                // });
 
                 // get category info
                 $.ajax({
@@ -180,7 +190,9 @@ if (strlen($_SESSION['alogin']) == 0) {
                         var category_colors = [
                             'rgb(255, 99, 132)',
                             'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)'
+                            'rgb(255, 205, 86)',
+                            'green',
+                            '#CC6B19'
                         ];
                         var transformData = JSON.parse(dataResult);
                         console.log("transformData", transformData);
@@ -190,7 +202,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                         var cat_percent = [];
                         transformData.map((item, key) => {
                             book_total += +item.TotalCount
-                            chart_category_colors.push(category_colors[key % 3])
+                            chart_category_colors.push(category_colors[key % 5])
                             cat_labels.push(item.CategoryName)
                         })
                         transformData.map((item, key) => {
@@ -227,10 +239,10 @@ if (strlen($_SESSION['alogin']) == 0) {
             })
             function getData(start_date, end_date){
                 var year_student_labels = {
-                    '1': "Năm nhất",
-                    '2': "Năm hai",
-                    '3': "Năm ba",
-                    '4': "Năm tư"
+                    '1': "1年生",
+                    '2': "2年生",
+                    '3': "3年生",
+                    '4': "4年生"
                 };
                 $.ajax({
                     url: "common/statistic_info.php",
@@ -272,7 +284,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                             data: {
                                 labels: year_students,
                                 datasets: [{
-                                    label: 'Số sách mượn trả',
+                                    label: '学年ごとの貸出冊数',
                                     data: lend_book_numbers,
                                     backgroundColor: backgroundColor,
                                     borderColor: borderColor,
@@ -283,10 +295,17 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 scales: {
                                     y: {
                                         beginAtZero: true,
-                                        // title: {
-                                        //     display: true,
-                                        //     text: ''
-                                        // }
+                                        title: {
+                                            display: true,
+                                            text: '冊数'
+                                        }
+                                    },
+                                    x: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: '学年'
+                                        }
                                     }
                                 }
                             }

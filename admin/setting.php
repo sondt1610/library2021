@@ -158,14 +158,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="panel-body">
                             <form role="form" method="post" name="chngpwd">
                                 <input name="id" class="form-control d-none" type="text" value="<?= $setting['id'] ?>"/>
-                                <div class="form-group">
-                                    <label>Tên trường</label>
-                                    <input name="school_name" class="form-control" type="text" value="<?= $setting['school_name'] ?>"/>
-                                </div>
-                                <div class="form-group">
-                                    <label>Mail trường</label>
-                                    <input name="school_mail" class="form-control" type="text" value="<?= $setting['school_mail'] ?>"/>
-                                </div>
+<!--                                <div class="form-group">-->
+<!--                                    <label>Tên trường</label>-->
+<!--                                    <input name="school_name" class="form-control" type="text" value="--><?//= $setting['school_name'] ?><!--"/>-->
+<!--                                </div>-->
+<!--                                <div class="form-group">-->
+<!--                                    <label>Mail trường</label>-->
+<!--                                    <input name="school_mail" class="form-control" type="text" value="--><?//= $setting['school_mail'] ?><!--"/>-->
+<!--                                </div>-->
                                 <div class="form-group">
                                     <label>最多の借りる回数</label>
                                     <input name="max_lended_book" class="form-control" type="number"  value="<?= $setting['max_lended_book'] ?>"/>

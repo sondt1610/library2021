@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 24, 2021 lúc 10:45 AM
+-- Thời gian đã tạo: Th10 26, 2021 lúc 05:41 PM
 -- Phiên bản máy phục vụ: 10.4.18-MariaDB
 -- Phiên bản PHP: 7.4.16
 
@@ -52,27 +52,29 @@ INSERT INTO `admin` (`id`, `FullName`, `AdminEmail`, `UserName`, `Password`, `up
 CREATE TABLE `lend` (
   `id` int(6) NOT NULL,
   `book_id` int(6) NOT NULL,
-  `book_title` varchar(100) CHARACTER SET utf8 NOT NULL,
+  `book_title` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
   `lend_time` date NOT NULL,
   `return_time` date DEFAULT NULL,
-  `user_id` int(3) NOT NULL
+  `user_id` int(3) NOT NULL,
+  `is_returned` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Đang đổ dữ liệu cho bảng `lend`
 --
 
-INSERT INTO `lend` (`id`, `book_id`, `book_title`, `lend_time`, `return_time`, `user_id`) VALUES
-(142, 74, '', '2020-12-20', '2020-10-02', 76),
-(144, 88, '', '2020-12-20', '2021-09-22', 75),
-(147, 104, '', '2020-08-18', '2020-08-20', 82),
-(148, 103, '', '2020-08-18', '2021-02-04', 82),
-(150, 101, '', '2020-08-18', '2021-05-10', 82),
-(151, 100, '', '2020-08-19', '2021-09-22', 82),
-(152, 102, '', '2020-08-19', '2021-02-15', 82),
-(164, 103, '', '2020-11-24', '2021-07-16', 84),
-(165, 104, '', '2020-11-29', '2021-09-22', 84),
-(166, 102, '', '2020-11-29', '2021-09-22', 84);
+INSERT INTO `lend` (`id`, `book_id`, `book_title`, `lend_time`, `return_time`, `user_id`, `is_returned`) VALUES
+(142, 74, '', '2020-12-20', '2020-10-02', 76, 1),
+(144, 88, '', '2020-12-20', '2021-09-22', 75, 0),
+(147, 104, '', '2020-08-18', '2020-08-20', 82, 0),
+(148, 103, '', '2020-08-18', '2021-02-04', 82, 0),
+(150, 101, '', '2020-08-18', '2021-05-10', 82, 0),
+(151, 100, '', '2020-08-19', '2021-09-22', 82, 0),
+(152, 102, '', '2020-08-19', '2021-02-15', 82, 0),
+(164, 103, '', '2020-11-24', '2021-07-16', 84, 0),
+(165, 104, '', '2020-11-29', '2021-11-09', 84, 0),
+(166, 102, '', '2020-11-29', '2021-09-22', 84, 0),
+(186, 74, NULL, '2021-10-26', '2021-11-09', 27, 0);
 
 -- --------------------------------------------------------
 
@@ -93,10 +95,7 @@ CREATE TABLE `setting` (
 --
 
 INSERT INTO `setting` (`id`, `school_name`, `school_mail`, `max_lended_book`, `max_lended_time`) VALUES
-(1, 'University', 'admin@gmail.com', '5', '10'),
-(2, 'abc', NULL, NULL, NULL),
-(3, 'sdfsd', 'efwe', '5', '10'),
-(4, 'sdfsd', 'efwe', '5', '10');
+(1, 'dfgd', 'dfgd', '7', '10');
 
 -- --------------------------------------------------------
 
@@ -181,15 +180,17 @@ CREATE TABLE `yoyaku` (
   `booking_time` date NOT NULL,
   `user_email` varchar(225) NOT NULL,
   `book_title` varchar(20) NOT NULL,
-  `book_w` text NOT NULL
+  `book_w` text NOT NULL,
+  `is_booked` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Đang đổ dữ liệu cho bảng `yoyaku`
 --
 
-INSERT INTO `yoyaku` (`id`, `book_id`, `user_id`, `user_number`, `booking_time`, `user_email`, `book_title`, `book_w`) VALUES
-(1, 80, 62, '10', '2021-08-30', 'adad@gmail.com', '', '');
+INSERT INTO `yoyaku` (`id`, `book_id`, `user_id`, `user_number`, `booking_time`, `user_email`, `book_title`, `book_w`, `is_booked`) VALUES
+(1, 74, 62, '10', '2021-08-30', 'adad@gmail.com', '', '', 0),
+(6, 74, 27, '43', '2021-07-14', 'dfsd@gmail.com', '', '', 1);
 
 -- --------------------------------------------------------
 
@@ -300,7 +301,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT cho bảng `lend`
 --
 ALTER TABLE `lend`
-  MODIFY `id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
+  MODIFY `id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
 -- AUTO_INCREMENT cho bảng `setting`
@@ -324,7 +325,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT cho bảng `yoyaku`
 --
 ALTER TABLE `yoyaku`
-  MODIFY `id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `yx_books`

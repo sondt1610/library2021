@@ -1,3 +1,18 @@
+<?php
+//session_start();
+//error_reporting(0);
+//include('../includes/config.php');
+
+$now = date('Y-m-d');
+$sql = "SELECT * FROM `lend` WHERE lend.return_time < '" . $now . "'";
+
+$query_select    = $dbh->prepare($sql);
+$query_select->execute();
+$results = $query_select->fetchAll(PDO::FETCH_OBJ);
+$count_user_overdue = $query_select->rowCount();
+
+//var_dump();
+?>
 <!-- LOGO HEADER START-->
 <div class="navbar navbar-inverse set-radius-zero">
     <div class="container">
@@ -57,6 +72,20 @@
                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="setting.php">貸出設定</a></li>
                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="statistical.php">統計</a></li>
                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="change-password.php">パスワードを変更</a></li>    
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-toggle" id="ddlmenuItem" data-toggle="dropdown">
+                                <span style="position: relative">
+                                    <i class="fa fa-bell" style="font-size: 20px;"></i>
+                                    <span class="notification"><?php echo $count_user_overdue ?></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="ddlmenuItem">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="list_lend_overdue.php">
+                                        Có <?php echo $count_user_overdue ?> user quá hạn trả sách</a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
