@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 26, 2021 lúc 05:41 PM
+-- Thời gian đã tạo: Th10 29, 2021 lúc 04:17 PM
 -- Phiên bản máy phục vụ: 10.4.18-MariaDB
 -- Phiên bản PHP: 7.4.16
 
@@ -155,7 +155,7 @@ INSERT INTO `user` (`id`, `name`, `number`, `password`, `email`, `tel`, `address
 (73, 'ning', '23TE456', 'b59c67bf196a4758191e42f76670ceba', '123@qq.com', '03-2101-1545', '台東区', 1),
 (74, 'ninglei', '', 'b59c67bf196a4758191e42f76670ceba', '123@qq.com', '03-2101-1545', '台東区', 3),
 (75, '田中二朗', '18TE777', '888c9ca4c82c4c0fed4d7b0fecf7ef85', 'tanakajiro@gmail.com', '123-456-7888', '台東区7-7-4', 2),
-(76, 'akiko', '', 'fb793a32ca76c662219266a71dbb7f24', 'akiko777@gmail.com', '123-456-7890', '台東区7-7-4', 4),
+(76, 'akiko', '', 'fb793a32ca76c662219266a71dbb7f24', 'sondt6951@co-well.vn', '123-456-7890', '台東区7-7-4', 4),
 (77, 'nei', '', 'b59c67bf196a4758191e42f76670ceba', 'l55698174@gmail.com', '0132546452', 'adf', 1),
 (78, 'asa', '21TE444', '6b620aedfa4cf153467265629501dd61', '123@qq.com', '01233212', '東京', 1),
 (79, 'assa', '', '6b620aedfa4cf153467265629501dd61', '123@qq.com', '01233212', '東京', 4),

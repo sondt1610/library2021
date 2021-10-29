@@ -1,3 +1,8 @@
+<?php
+session_start();
+error_reporting(0);
+include('includes/config.php');
+?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

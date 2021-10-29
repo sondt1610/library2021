@@ -1,19 +1,61 @@
 <?php
 session_start();
 error_reporting(0);
+require_once '../vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header('location:adminlogin.php');
 } else {
-    if (isset($_GET['email'])) {
-        $id    = $_GET['email'];
-        var_dump($id);
-//        $sql   = "delete from yx_books  WHERE id=:id";
-//        $query = $dbh->prepare($sql);
-//        $query->bindParam(':id', $id, PDO::PARAM_STR);
-//        $query->execute();
-//        $_SESSION['delmsg'] = "Category deleted scuccessfully ";
-//        header('location:manage-books.php');
+    if($_SESSION['msg']){
+        $msg = $_SESSION['msg'];
+    }
+    if($_SESSION['error']){
+        $error = $_SESSION['error'];
+    }
+    if (isset($_GET['email']) && isset($_GET['book_id']) && isset($_GET['return_time'])) {
+        $book_id = $_GET['book_id'];
+        $email    = $_GET['email'];
+        $return_time    = $_GET['return_time'];
+
+        $sql_query_book = "SELECT * FROM `yx_books` WHERE id = '" . $book_id . "'";
+        $query_select_book   = $dbh->prepare($sql_query_book);
+        $query_select_book->execute();
+        $book = $query_select_book->fetch(PDO::FETCH_OBJ);
+//        var_dump($book);
+
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+//    $mail->Host = 'smtp.mailtrap.io';
+//    $mail->Username = '9a9b4c3119f92b';
+//    $mail->Password = '6e47ae27fc3fea';
+//    $mail->Port = 2525;
+
+        $mail->Host = 'smtp.gmail.com';
+        // 1. TODO: add user name and password of gmail (mail from)
+        $mail->Username = 'test@gmail.com';
+        $mail->Password = '123456';
+        $mail->Port = 587;
+
+        $mail->SMTPAuth = true;
+        $mail->SMTPSecure = 'tls';
+        $mail->setFrom('info@mailtrap.io', 'Library');
+        // 2. TODO: thêm địa chỉ mail người nhận
+        $mail->addAddress($email, 'Student');
+        $mail->Subject = 'Thong bao muon sach qua han';
+        $mail->isHTML(true);
+        $mailContent = "<p>Bạn đã mượn sách " . $book->name . " quá thời hạn trả sách ngày " . $return_time . ". Vui lòng trả sách cho thư viện</p>";
+        $mail->Body = $mailContent;
+        if($mail->send()){
+            $_SESSION['msg'] = "Đã gửi thông báo cho user thành công";
+        }else{
+            $_SESSION['error'] = "Gửi thông báo thất bại";
+        }
+//        var_dump($mail->Host);
+        header('location:list_lend_overdue.php');
+    } else {
+        $_SESSION['msg'] = "";
+        $_SESSION['error'] = "";
     }
     ?>
     <!DOCTYPE html>
@@ -48,6 +90,24 @@ if (strlen($_SESSION['alogin']) == 0) {
                 </div>
             </div>
             <div class="row">
+                <?php if ($error != "") {
+                    ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">
+                            <strong>Error :</strong>
+                            <?php echo htmlentities($error); ?>
+                        </div>
+                    </div>
+                <?php } ?>
+                <?php if ($msg != "") {
+                    ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-success">
+                            <strong>Success :</strong>
+                            <?php echo htmlentities($msg); ?>
+                        </div>
+                    </div>
+                <?php } ?>
                 <div class="col-md-12">
                     <!-- Advanced Tables -->
                     <div class="panel panel-default">
@@ -63,7 +123,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         <th>本のタイトル</th>
                                         <th>借りる日</th>
                                         <th>返却日</th>
-<!--                                        <th>Action</th>-->
+                                        <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -86,10 +146,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <td class="center"><?php echo htmlentities($result->BookName); ?></td>
                                                 <td class="center"><?php echo htmlentities($result->lend_time); ?></td>
                                                 <td class="center"><?php echo htmlentities($result->return_time); ?></td>
-<!--                                                <td class="center">-->
-<!--                                                    <a href="list_lend_overdue.php?email=--><?php //echo htmlentities($result->email); ?><!--"-->
-<!--                                                    <button class="btn btn-xs btn-primary">Thông báo</button>-->
-<!--                                                </td>-->
+                                                <td class="center">
+                                                    <a
+                                                        href="list_lend_overdue.php?return_time=<?php echo htmlentities($result->return_time); ?>&book_id=<?php echo htmlentities($result->book_id); ?>&email=<?php echo htmlentities($result->email); ?>"
+                                                    <button class="btn btn-xs btn-primary">Gửi mail nhắc nhở</button>
+                                                </td>
                                             </tr>
                                             <?php $cnt = $cnt + 1;
                                         }

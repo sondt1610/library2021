@@ -6,10 +6,13 @@
 $now = date('Y-m-d');
 $sql = "SELECT * FROM `lend` WHERE lend.return_time < '" . $now . "'";
 
-$query_select    = $dbh->prepare($sql);
-$query_select->execute();
-$results = $query_select->fetchAll(PDO::FETCH_OBJ);
-$count_user_overdue = $query_select->rowCount();
+$count_user_overdue = 0;
+if(isset($dbh)) {
+    $query_select    = $dbh->prepare($sql);
+    $query_select->execute();
+    $results = $query_select->fetchAll(PDO::FETCH_OBJ);
+    $count_user_overdue = $query_select->rowCount();
+}
 
 //var_dump();
 ?>
