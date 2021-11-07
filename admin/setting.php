@@ -32,8 +32,6 @@ if (strlen($_SESSION['alogin']) == 0) {
     if(empty($setting)) {
         $setting = [
             'id' => 0,
-            'school_name' => '',
-            'school_mail' => '',
             'max_lended_book' => SOLANMUON,
             'max_lended_time' => SONGAY,
         ];
@@ -47,31 +45,24 @@ if (strlen($_SESSION['alogin']) == 0) {
     }
     if (isset($_POST['save_settings'])) {
         $id = $_POST['id'];
-        $school_name = $_POST['school_name'];
-        $school_mail = $_POST['school_mail'];
         $max_lended_book = $_POST['max_lended_book'];
         $max_lended_time = $_POST['max_lended_time'];
 
         if($id) {
-            $sql_update = "update  setting set school_name=:school_name, school_mail=:school_mail,
-                max_lended_book=:max_lended_book, max_lended_time=:max_lended_time where id=:id";
+            $sql_update = "update  setting set max_lended_book=:max_lended_book, max_lended_time=:max_lended_time where id=:id";
         } else {
-            $sql_update = "INSERT INTO  setting(school_name, school_mail, max_lended_book, max_lended_time)
-                VALUES(:school_name, :school_mail, :max_lended_book, :max_lended_time)";
+            $sql_update = "INSERT INTO  setting(max_lended_book, max_lended_time)
+                VALUES(:max_lended_book, :max_lended_time)";
         }
         $query_update = $dbh->prepare($sql_update);
         if($id) {
             $query_update->bindParam(':id', $id, PDO::PARAM_STR);
         }
-        $query_update->bindParam(':school_name', $school_name, PDO::PARAM_STR);
-        $query_update->bindParam(':school_mail', $school_mail, PDO::PARAM_STR);
         $query_update->bindParam(':max_lended_book', $max_lended_book, PDO::PARAM_STR);
         $query_update->bindParam(':max_lended_time', $max_lended_time, PDO::PARAM_STR);
         $status_update = $query_update->execute();
         $new_params = [
             'id' => $id,
-            'school_name' => $school_name,
-            'school_mail' => $school_mail,
             'max_lended_book' => $max_lended_book,
             'max_lended_time' => $max_lended_time,
         ];
@@ -158,14 +149,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="panel-body">
                             <form role="form" method="post" name="chngpwd">
                                 <input name="id" class="form-control d-none" type="text" value="<?= $setting['id'] ?>"/>
-<!--                                <div class="form-group">-->
-<!--                                    <label>Tên trường</label>-->
-<!--                                    <input name="school_name" class="form-control" type="text" value="--><?//= $setting['school_name'] ?><!--"/>-->
-<!--                                </div>-->
-<!--                                <div class="form-group">-->
-<!--                                    <label>Mail trường</label>-->
-<!--                                    <input name="school_mail" class="form-control" type="text" value="--><?//= $setting['school_mail'] ?><!--"/>-->
-<!--                                </div>-->
                                 <div class="form-group">
                                     <label>最多の借りる回数</label>
                                     <input name="max_lended_book" class="form-control" type="number"  value="<?= $setting['max_lended_book'] ?>"/>

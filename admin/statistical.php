@@ -115,7 +115,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Số sách mượn trả',
+                        label: '学年ごとの貸出冊数',
                         data: [],
                         backgroundColor: ['rgba(54, 162, 235, 0.2)'],
                         borderColor: ['rgba(54, 162, 235, 1)'],
