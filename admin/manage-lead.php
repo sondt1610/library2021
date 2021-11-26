@@ -33,10 +33,11 @@ if (strlen($_SESSION['alogin']) == 0) {
         $sql_query_reserve = "SELECT yx_books.name as book_name, user.name as user_name, yoyaku.id, yoyaku.book_id, yoyaku.user_id  FROM `yoyaku` 
             join user on user.id=yoyaku.user_id 
             join yx_books on yx_books.id=yoyaku.book_id 
-            WHERE yoyaku.book_id = '" . $book_id . "' ORDER BY booking_time ASC";
+            WHERE yoyaku.book_id = '" . $book_id . "' AND yoyaku.is_booked=0 ORDER BY booking_time ASC";
         $query_select_reserve    = $dbh->prepare($sql_query_reserve);
         $query_select_reserve->execute();
         $reserve = $query_select_reserve->fetch(PDO::FETCH_OBJ);
+//        var_dump($query_select_reserve); die('sdfs');
         if($reserve) {
             $sql_update_reserve = "update  yoyaku set is_booked=1 where id='" . $reserve->id . "'";
             $query_update_reserve  = $dbh->prepare($sql_update_reserve);
@@ -141,12 +142,24 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     <?php $sql = "SELECT user.name,user.number as GakuSekiNumber, yx_books.name as BookName, yx_books.leave_number,  
                                     lend.id, lend.return_time , lend.book_id, lend.is_returned,
                                             lend.lend_time, lend.user_id  from lend join user 
-                                        on user.id = lend.user_id join yx_books on yx_books.id = lend.book_id where lend.is_returned = 0";
+                                        on user.id = lend.user_id join yx_books on yx_books.id = lend.book_id";
 //die('43');
                                     $query     = $dbh->prepare($sql);
                                     $query->execute();
                                     $results = $query->fetchAll(PDO::FETCH_OBJ);
                                     $cnt     = 1;
+
+                                    $sql_query_reserve_book = "SELECT yx_books.name as book_name, user.name as user_name, yoyaku.id, yoyaku.book_id, yoyaku.user_id  FROM `yoyaku` 
+            join user on user.id=yoyaku.user_id 
+            join yx_books on yx_books.id=yoyaku.book_id where yoyaku.is_booked=0";
+                                    $query_select_reserve_book    = $dbh->prepare($sql_query_reserve_book);
+                                    $query_select_reserve_book->execute();
+                                    $reserve_book = $query_select_reserve_book->fetchAll(PDO::FETCH_OBJ);
+                                    $new_reserves = [];
+                                    foreach($reserve_book as $book){
+                                        $new_reserves[$book->book_id] = $book->book_name;
+                                    }
+//                                    var_dump($results);die('sfds');
                                     if ($query->rowCount() > 0) {
                                         foreach ($results as $result) { ?>
                                             <tr class="odd gradeX">
@@ -157,8 +170,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <td class="center"><?php echo htmlentities($result->lend_time); ?></td>
                                                 <td class="center"><?php echo htmlentities($result->return_time); ?></td>
                                                 <td class="center">
-                                                    <a href="manage-lead.php?lend_id=<?php echo htmlentities($result->id); ?>&book_id=<?php echo htmlentities($result->book_id); ?>"
-                                                    <button class="btn btn-xs btn-primary">Trả sách</button>
+                                                    <?php if (!empty($new_reserves[$result->book_id]) && !$result->is_returned) {
+                                                        ?>
+                                                        <a href="manage-lead.php?lend_id=<?php echo htmlentities($result->id); ?>&book_id=<?php echo htmlentities($result->book_id); ?>"
+                                                        <button class="btn btn-xs btn-primary">Trả sách</button>
+                                                    <?php } ?>
                                                 </td>
                                             </tr>
                                             <?php $cnt = $cnt + 1;

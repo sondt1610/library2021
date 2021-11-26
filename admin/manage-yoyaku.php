@@ -118,7 +118,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     </thead>
                                     <tbody>
                                     <?php $sql = "SELECT yoyaku.*, yoyaku.id as yo_id, yx_books.name as BookName, user.name from  yoyaku join yx_books on yx_books.id=yoyaku.book_id
-                                        join user on user.id=yoyaku.user_id";
+                                        join user on user.id=yoyaku.user_id where yoyaku.is_booked=0";
 
                                     $query     = $dbh->prepare($sql);
                                     $query->execute();
