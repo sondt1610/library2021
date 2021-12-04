@@ -25,19 +25,27 @@ if (strlen($_SESSION['alogin']) == 0) {
 
         $bookname = $_POST['bookname'];
         $category = $_POST['category'];
-        $author   = $_POST['author'];
         $isbn     = $_POST['isbn'];
         $price    = $_POST['price'];
         $type    = $_POST['type'];
         $writer    = $_POST['writer'];
         $bookid   = intval($_GET['bookid']);
 
-        $sql      = "update  yx_books set name=:bookname, images=:avatar, CatId=:category,Author=:author,
+        $new_params = [
+            'avatar' => $avatar,
+            'bookname' => $bookname,
+            'category' => $category,
+            'isbn' => $isbn,
+            'price' => $price,
+            'type' => $type,
+            'writer' => $writer,
+            'bookid' => $bookid,
+        ];
+        $sql      = "update  yx_books set name=:bookname, images=:avatar, CatId=:category,
             ISBN=:isbn,price=:price, type=:type, writer=:writer where id=:bookid";
         $query    = $dbh->prepare($sql);
         $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
         $query->bindParam(':category', $category, PDO::PARAM_STR);
-       $query->bindParam(':author', $author, PDO::PARAM_STR);
         $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
         $query->bindParam(':price', $price, PDO::PARAM_STR);
         $query->bindParam(':avatar', $avatar, PDO::PARAM_STR);
